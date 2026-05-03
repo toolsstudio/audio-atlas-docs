@@ -1,6 +1,6 @@
 # Configuration Reference
 
-Audio Atlas has two configuration assets: `AudioAtlasSettings` (editor-side) and `AudioAtlasConfig` (runtime-side). Both are `ScriptableObject`-backed and created automatically.
+Audio Atlas has two configuration assets: `AudioAtlasSettings` (editor-side) and `AudioAtlasConfig` (runtime-side). Both are `ScriptableObject`-backed and created automatically on first launch.
 
 ---
 
@@ -12,8 +12,6 @@ Audio Atlas has two configuration assets: `AudioAtlasSettings` (editor-side) and
 **API:** `AudioAtlasSettings.GetOrCreate()` · `AudioAtlasSettings.GetConfig()`
 
 ### Embedded Config (AudioAtlasConfig)
-
-These fields are serialized as `_config` inside the settings asset and passed to `AudioRegistry.Initialize()` at bootstrap.
 
 | Field | Default | Type | Description |
 |---|---|---|---|
@@ -40,8 +38,6 @@ These fields are serialized as `_config` inside the settings asset and passed to
 
 ### Editor Display Settings
 
-These fields control Scene View gizmos and are not passed to the runtime.
-
 | Field | Default | Description |
 |---|---|---|
 | `ShowSpatialGizmos` | `true` | Draw distance sphere gizmos on selected 3D sources |
@@ -58,49 +54,43 @@ These fields control Scene View gizmos and are not passed to the runtime.
 **Scope:** Runtime — loaded by `AudioAtlasBootstrap` via `Resources.Load<AudioAtlasConfigAsset>("AudioAtlasConfig")`  
 **Create:** `Window → Audio → Audio Atlas → Create Config Asset`
 
-This asset exposes a subset of `AudioAtlasConfig` fields for runtime use. If the asset is missing, Bootstrap creates an `AudioAtlasConfig` with defaults and logs a warning.
-
 | Field | Default | Description |
 |---|---|---|
-| `MaxTrackedSources` | `128` | Must match or exceed the editor setting for consistent display |
+| `MaxTrackedSources` | `128` | Must match or exceed editor setting for consistent display |
 | `MaxMixerGroups` | `64` | Mixer group tracking capacity |
 | `EventRingBufferSize` | `512` | Event log ring buffer size |
 | `StealRingBufferSize` | `256` | Voice steal ring buffer size |
 
-> **Tip:** If you increase `MaxTrackedSources` in the editor settings, update the runtime config asset to match. A mismatch causes Live Sources to show a truncated list while the runtime tracks more sources than the editor displays.
+> **Tip:** If you increase `MaxTrackedSources` in the editor settings, update the runtime config asset to match. A mismatch causes Live Sources to show a truncated list while the runtime tracks more.
 
 ---
 
-## Scripting Defines
+## Scripting Defines {#scripting-defines}
 
 Add/remove via `Project Settings → Player → Scripting Define Symbols`.
 
 | Define | Scope | Effect |
 |---|---|---|
 | `AUDIOATLAS_DEBUG` | Runtime + Editor | Activates full monitoring in player builds. **Remove for release.** |
-| `AUDIOATLAS_DEV` | Editor only | Enables internal developer warnings (for Tools Studio use). Not for end users. |
+| `AUDIOATLAS_DEV` | Editor only | Enables internal developer warnings. Not for end users. |
 
 ### Release Build Checklist
 
-Before shipping, confirm all of these:
-
 - [ ] `AUDIOATLAS_DEBUG` is **not** in your Scripting Define Symbols
-- [ ] Player build log shows no `AudioAtlas.Runtime` in the assembly list (unless you explicitly reference it)
-- [ ] `Assets/AudioAtlas/Sessions/` is excluded from build (it contains editor-only JSON — add to `.gitignore` and asset bundle exclusion list)
+- [ ] Player build log shows no `AudioAtlas.Runtime` in the assembly list
+- [ ] `Assets/AudioAtlas/Sessions/` is excluded from build
 
 ### Development Build Checklist
 
-For QA and internal builds where you want monitoring active:
-
 - [ ] `AUDIOATLAS_DEBUG` defined
 - [ ] `AudioAtlas.Runtime` referenced in your game assembly's asmdef
-- [ ] `AudioAtlasConfig.asset` present in `Resources/` with appropriate `MaxTrackedSources`
+- [ ] `AudioAtlasConfig.asset` present in `Resources/`
 
 ---
 
 ## Project Settings Integration
 
-Audio Atlas registers a `SettingsProvider` under `Project Settings → AudioAtlas`. This page mirrors `AudioAtlasSettings.asset` and is updated via `AudioAtlasSettingsProvider`, which raises `EventBus.Raise(AudioAtlasEvent.SettingsChanged)` on any modification so panels can react immediately.
+Audio Atlas registers a `SettingsProvider` under `Project Settings → AudioAtlas`. Any modification raises `EventBus.Raise(AudioAtlasEvent.SettingsChanged)` so panels react immediately.
 
 ---
 
@@ -109,7 +99,7 @@ Audio Atlas registers a `SettingsProvider` under `Project Settings → AudioAtla
 **Editor settings:**
 ```
 Delete Assets/AudioAtlas/Settings/AudioAtlasSettings.asset
-Reopen: Window → Audio → Audio Atlas  (auto-recreated with defaults)
+Reopen the window — asset is auto-recreated with defaults
 ```
 
 **Runtime config:**
