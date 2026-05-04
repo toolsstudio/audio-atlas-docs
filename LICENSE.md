@@ -110,4 +110,6 @@ This License constitutes the entire agreement between the parties regarding the 
 
 ---
 
+_This license operates in conjunction with the Unity Asset Store EULA_
+
 **Tools Studio** · [Contact Support](mailto:tools.studio@zohomail.in)
